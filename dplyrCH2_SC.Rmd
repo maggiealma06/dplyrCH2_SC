@@ -78,6 +78,7 @@ the first argument being the `tbl` you want to select variables from and the `Va
 # Your code goes here
 # Return a copy of hflights that contains the four columns related to delay.
 
+select(ActualElapsedTime, AirTime, ArrDelay, DepDelay)
 
 ```
 
