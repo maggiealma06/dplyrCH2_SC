@@ -14,7 +14,7 @@ library(dplyr)
 library(hflights)
 library(scales)
 # Convert the hflights data.frame into a hflights tbl
-hflights <- tbl_df(hflights)
+hflights <- tibble::as_tibble(hflights)
 # Create a random subset of size 10,000 to work with
 set.seed(123)
 train <- sample(227496, 10000)
