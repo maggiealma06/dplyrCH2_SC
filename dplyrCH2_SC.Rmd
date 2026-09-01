@@ -78,7 +78,14 @@ the first argument being the `tbl` you want to select variables from and the `Va
 # Your code goes here
 # Return a copy of hflights that contains the four columns related to delay.
 
-select(ActualElapsedTime, AirTime, ArrDelay, DepDelay)
+library(dplyr)
+select(hflights, ActualElapsedTime, AirTime, ArrDelay, DepDelay)
+
+
+#or you could do
+hflights |>
+  select(ActualElapsedTime:DepDelay)
+#if collums are consecutive
 
 ```
 
@@ -87,7 +94,7 @@ select(ActualElapsedTime, AirTime, ArrDelay, DepDelay)
 ```{r}
 # Your code goes here
 # print hflights, nothing has changed!
-
+hflights
 ```
 
 * Return a copy of `hflights` containing the columns `Origin` up to `Cancelled`. Do not use integer indexes.
@@ -97,6 +104,12 @@ select(ActualElapsedTime, AirTime, ArrDelay, DepDelay)
 # Return a copy of hflights containing the columns Origin up to Cancelled 
 names(hflights)
 
+select(hflights, Origin:Cancelled)
+
+#or
+
+hflights |>
+  select(Origin:Cancelled)
 ```
 
 * Find the most concise way to select: columns `Year` up to and including `DayOfWeek`, columns `ArrDelay` up to and including `Diverted`. You may want to examine the order of hflight's column names before you begin.
@@ -106,7 +119,10 @@ names(hflights)
 # Answer to last question: be concise! 
 names(hflights)
 
+select(hflights, -(DepTime:AirTime)) #this one gets rid of the chunks in between rather than listing the variables you want
 
+hflights |>
+  select(Year:DayOfWeek, ArrDelay:Diverted)
 ```
 
 ## Helper functions for variable selection
@@ -129,6 +145,8 @@ __Watch out:__ Surround character strings with quotes when you pass them to a he
 ```{r}
 #Your code goes here
 # Return a tbl containing just ArrDelay and DepDelay
+
+select(hflights, contains("Delay"))
 
 
 ```
@@ -166,6 +184,7 @@ ex1r <- hflights[c("TaxiIn", "TaxiOut", "Distance")]
 head(ex1r)
 # Your code goes below
 
+select(hflights, "TaxiIn", "TaxiOut", "Distance") |> head(6)
 
 ```
 
@@ -174,6 +193,7 @@ head(ex1r)
 ex2r <- hflights[c("Year", "Month", "DayOfWeek", "DepTime", "ArrTime")]
 head(ex2r)
 # Your code goes below
+
 
 
 ```
@@ -207,7 +227,7 @@ Here, data is the `tbl` you want to use to create new columns. The second argume
 # Your code goes here
 # Add the new variable ActualGroundTime to a copy of hflights and save the result as g1.
 
-
+g1 <- mutate(hflights, ActualGroundTime = ActualElapsedTime - AirTime) 
 ```
 
 * Which variables in `g1` do you think count as a plane's "ground time"? Use `mutate()` to add these variables together and save them as `GroundTime`. Save your results as `g2`. Were you right? If you are, `GroundTime` should equal `ActualGroundTime` whenever an `NA` is not involved. Check this by printouts in the console.
@@ -215,7 +235,7 @@ Here, data is the `tbl` you want to use to create new columns. The second argume
 ```{r}
 # Add the new variable GroundTime to a copy of g1 and save the result as g2.
 
-
+g2 <- mutate(g1, GroundTime = TaxiIn + TaxiOut) |> relocate(GroundTime, .after = ActualGroundTime) 
 ```
 
 * Add a new variable to `g2` named `AverageSpeed` that denotes the average speed that each plane flew in miles per hour. Save the resulting dataset as `g3`. Use `Distance / AirTime * 60`.
@@ -235,7 +255,9 @@ Here, data is the `tbl` you want to use to create new columns. The second argume
 m1 <- mutate(hflights, loss = ArrDelay - DepDelay)
 # Your code goes here
 # Add a second variable loss_percent to the dataset and save the result to m1.
-
+m1 <- mutate(hflights, loss = ArrDelay - DepDelay, loss_percent = (ArrDelay - DepDelay) / DepDelay * 100) |> 
+  relocate(loss, .after = Year)
+head(m1)
 
 ```
 
@@ -246,7 +268,9 @@ m1 <- mutate(hflights, loss = ArrDelay - DepDelay)
 # Remove the redundancy from your previous exercise and reuse loss to define 
 # the loss_percent variable.  Assign the result to m2.
 
-
+m2 <- mutate(hflights, loss = ArrDelay - DepDelay, loss_percent = loss / DepDelay * 100) |>
+  relocate(loss_percent, .after = Year) 
+head(m2)
 ```
 
 * Using `mutate()`, create three new variables: (1) `TotalTaxi`, which is the sum of all taxiing times; (2) `ActualGroundTime`, which is the difference of `ActualElapsedTime` and `AirTime`; (3) `Diff`, the difference between the two newly created variables. Assign the result to `m3`. Observe that the `Diff` column will be zero at all times if you solved the exercise correctly!
